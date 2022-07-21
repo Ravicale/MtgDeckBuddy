@@ -205,7 +205,6 @@ public class CardDatabase {
 			for (File f : files) {
 				instance.readDecFile(f, Card::addOwned);
 			}
-			Gui.updateCardInfo();
 			Gui.unlockDeck();
 		});
 	}
@@ -225,7 +224,6 @@ public class CardDatabase {
 				card.banned = true;
 				card.setInDeck(0);
 			});
-			Gui.updateCardInfo();
 			Gui.unlockDeck();
 		});
 	}
@@ -239,7 +237,6 @@ public class CardDatabase {
 			Gui.lockDeck();
 			instance.readDecFile(file, Card::addToDeck);
 			ImageStore.setDeckPrefetchList(instance.deckList);
-			Gui.updateCardInfo();
 			Gui.unlockDeck();
 		});
 	}
@@ -302,7 +299,6 @@ public class CardDatabase {
 			for (Card card : instance.cardDataList) {
 				card.setOwned(99);
 			}
-			Gui.updateCardInfo();
 			Gui.unlockDeck();
 		});
 	}
@@ -314,33 +310,31 @@ public class CardDatabase {
 	 @param action Action to perform for every card.
 	 */
 	private void readDecFile(File file, ObjIntConsumer<Card> action) {
-		databaseWorkerThread.submit(() -> {
-			Logger.info("Reading collection file at '{}'.", file.getAbsolutePath());
-			try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-				long lineNum = 0;
-				String line;
+		Logger.info("Reading collection file at '{}'.", file.getAbsolutePath());
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			long lineNum = 0;
+			String line;
 
-				while ((line = reader.readLine()) != null) {
-					try {
-						lineNum++;
-						if (!line.isEmpty() && !line.startsWith("//")) {
-							int count = Integer.parseInt(line.substring(0, line.indexOf(' ')));
-							String name = line.substring(line.indexOf(' ')).trim();
-							Card card = instance.cardMap.get(name);
-							if (card != null) {
-								action.accept(card, count);
-							} else {
-								Logger.error("Unable to find card named {} in database!", name);
-							}
+			while ((line = reader.readLine()) != null) {
+				try {
+					lineNum++;
+					if (!line.isEmpty() && !line.startsWith("//")) {
+						int count = Integer.parseInt(line.substring(0, line.indexOf(' ')));
+						String name = line.substring(line.indexOf(' ')).trim();
+						Card card = instance.cardMap.get(name);
+						if (card != null) {
+							action.accept(card, count);
+						} else {
+							Logger.error("Unable to find card named {} in database!", name);
 						}
-					} catch (NumberFormatException e) {
-						Logger.error(e, "Unable to read number of cards in line {} or {}", lineNum, file.getName());
 					}
+				} catch (NumberFormatException e) {
+					Logger.error(e, "Unable to read number of cards in line {} or {}", lineNum, file.getName());
 				}
-			} catch (IOException e) {
-				Logger.error(e, "Error while reading file {}.", file.getName());
 			}
-		});
+		} catch (IOException e) {
+			Logger.error(e, "Error while reading file {}.", file.getName());
+		}
 	}
 
 	/**

@@ -138,14 +138,6 @@ public class Gui {
 		}
 	}
 
-	public static void updateCardInfo() {
-		SwingUtilities.invokeLater(() -> {
-			cardListGui.updateTable();
-			cardInfoGui.tryEnableAddButton();
-			cardInfoGui.tryEnableRemoveButton();
-		});
-	}
-
 	public static JFrame getFrame() {
 		if (!SwingUtilities.isEventDispatchThread()) {
 			try {

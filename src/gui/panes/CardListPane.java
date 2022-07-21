@@ -140,20 +140,19 @@ public class CardListPane extends JPanel {
 
 	public void updateRow(int id) {
 		if (model != null) {
-			Logger.info("Updating table row for card #{}.", id);
+			Logger.debug("Updating table row for card #{}.", id);
 			model.fireTableRowsUpdated(id, id);
-			cardTable.repaint();
 		} else {
-			Logger.error("Attempted to update a card row when the card table has not been fully initialized.");
+			Logger.error("Attempted to update a card row when the model has not been fully initialized.");
 		}
 	}
 
 	public void updateTable() {
 		if (model != null) {
+			Logger.debug("Updating table for all cards.");
 			model.fireTableDataChanged();
-			cardTable.repaint();
 		} else {
-			Logger.error("Attempted to update a card row when the card table has not been fully initialized.");
+			Logger.error("Attempted to update a the card table when the model has not been fully initialized.");
 		}
 	}
 }

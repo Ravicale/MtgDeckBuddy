@@ -221,7 +221,7 @@ public class Card {
 	/** Sets the number of copies of this card that are owned. */
 	public synchronized void setOwned(int count) {
 		owned = new CardField<>(count);
-		inDeck = new CardField<>(Integer.min((int) inDeck.data, count));
+		setInDeck(copiesInDeck());
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class Card {
 	 */
 	public synchronized void addOwned(int count) {
 		owned = new CardField<>((int) owned.data + count);
-		inDeck = new CardField<>(Integer.min((int) inDeck.data, count));
+		setInDeck(copiesInDeck());
 	}
 
 	public synchronized int getOwned() {
