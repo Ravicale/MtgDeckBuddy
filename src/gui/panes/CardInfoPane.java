@@ -74,7 +74,7 @@ public class CardInfoPane extends JPanel {
 	}
 
 	public void setCard(Card card, ImageIcon front, ImageIcon back) {
-		Logger.info("Setting selected card to {} - #{}", card.getName(), card.id);
+		Logger.info("Setting selected card to {} - #{} with {} and {}", card.getName(), card.id, front, back);
 		if (front != null && back != null) {
 			flipButton.setVisible(true);
 		} else {

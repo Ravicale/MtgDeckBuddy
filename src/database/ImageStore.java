@@ -37,9 +37,9 @@ public class ImageStore {
 		while (true) {
 			try {
 				Logger.info("Prefetching cards.");
-				while (!deckPrefetchQueue.isEmpty()) {
-					Card currentCard = deckPrefetchQueue.pop();
-					Logger.info("Prefetching card {}.", currentCard.getName());
+				while (!guiPrefetchQueue.isEmpty()) {
+					Card currentCard = guiPrefetchQueue.pop();
+					Logger.trace("Prefetching card {}.", currentCard.getName());
 					if (currentCard.frontImageUrl != null) {
 						getImageFromScryfall(currentCard.frontImageUrl);
 					}
@@ -48,9 +48,9 @@ public class ImageStore {
 					}
 				}
 
-				while (!guiPrefetchQueue.isEmpty()) {
-					Card currentCard = guiPrefetchQueue.pop();
-					Logger.info("Prefetching card {}.", currentCard.getName());
+				while (!deckPrefetchQueue.isEmpty()) {
+					Card currentCard = deckPrefetchQueue.pop();
+					Logger.trace("Prefetching card {}.", currentCard.getName());
 					if (currentCard.frontImageUrl != null) {
 						getImageFromScryfall(currentCard.frontImageUrl);
 					}
@@ -58,11 +58,15 @@ public class ImageStore {
 						getImageFromScryfall(currentCard.backImageUrl);
 					}
 				}
+
+				Logger.info("Prefetching complete.");
 				synchronized (imagePrefetchActive) {
+					//Just wait indefinitely.
+					//Leaves via interruptedException since we want to interrupt any in-progress image loads when the queues change.
 					imagePrefetchActive.wait();
 				}
 			} catch (InterruptedException e) {
-				Logger.info("Prefetch lists updated, restarting prefetch process.");
+				Logger.debug("Prefetch lists updated, restarting prefetch process.");
 			}
 		}
 	});
@@ -76,18 +80,12 @@ public class ImageStore {
 		deckPrefetchQueue.clear();
 		deckPrefetchQueue.addAll(cards);
 		prefetchThread.interrupt();
-		synchronized (imagePrefetchActive) {
-			imagePrefetchActive.notifyAll();
-		}
 	}
 
 	public static void setPrefetchList(Collection<Card> cards) {
 		guiPrefetchQueue.clear();
 		guiPrefetchQueue.addAll(cards);
 		prefetchThread.interrupt();
-		synchronized (imagePrefetchActive) {
-			imagePrefetchActive.notifyAll();
-		}
 	}
 
 	/**
@@ -129,7 +127,6 @@ public class ImageStore {
 		ScaleableImageIcon icon = new ScaleableImageIcon(rawImage);
 		icon.setIconWidth(UIConstants.CARD_IMAGE_SIZE.width);
 		icon.setIconHeight(UIConstants.CARD_IMAGE_SIZE.height);
-		Logger.info("Successfully loaded image '{}'.", imageUrl.toString());
 		return icon;
 	}
 
@@ -139,7 +136,7 @@ public class ImageStore {
 		//Check if we already have the image, and can reuse it first!
 		BufferedImage image = remoteImageCache.get(urlString);
 		if (image != null) {
-			Logger.debug("Loaded image from cache '{}'.", urlString);
+			Logger.trace("Loaded image from cache '{}'.", urlString);
 			return image;
 		}
 
@@ -155,7 +152,7 @@ public class ImageStore {
 
 		try {
 			image = ImageIO.read(imageUrl);
-			Logger.debug("Loaded image from Scryfall '{}'.", urlString);
+			Logger.info("Loaded image from Scryfall '{}'.", urlString);
 		} catch (IOException e) {
 			Logger.warn("Unable to load image '{}'", imageUrl);
 			return null;
