@@ -90,7 +90,6 @@ public class CardListPane extends JPanel {
 
 	public void updatePrefetching() {
 		if (model != null && model.getRowCount() > 1) {
-			List<Card> visibleCards = new ArrayList<>();
 			Rectangle viewport = cardTable.getVisibleRect();
 			int firstRow = cardTable.rowAtPoint(viewport.getLocation());
 			if (firstRow == -1) {
@@ -99,6 +98,7 @@ public class CardListPane extends JPanel {
 			viewport.translate(0, viewport.height);
 			int visibleRows = cardTable.rowAtPoint(viewport.getLocation()) - firstRow;
 			int lastRow = (visibleRows > 0) ? visibleRows+firstRow : cardTable.getRowCount() - 1;
+			List<Card> visibleCards = new ArrayList<>(lastRow - firstRow);
 			Logger.debug("First row = {}, Visible rows = {}, Last row = {}", firstRow, visibleRows, lastRow);
 			for(int row=firstRow; row <= lastRow; row++) {
 				int id = cardTable.convertRowIndexToModel(row);

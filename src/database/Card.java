@@ -224,10 +224,6 @@ public class Card {
 		setInDeck(copiesInDeck());
 	}
 
-	/**
-
-	 * @param count
-	 */
 	public synchronized void addOwned(int count) {
 		owned = new CardField<>((int) owned.data + count);
 		setInDeck(copiesInDeck());
