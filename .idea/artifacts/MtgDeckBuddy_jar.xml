@@ -3,10 +3,11 @@
     <output-path>$PROJECT_DIR$/out/artifacts/MtgDeckBuddy_jar</output-path>
     <root id="archive" name="MtgDeckBuddy.jar">
       <element id="module-output" name="MtgDeckBuddy" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/Lib/flatlaf-2.3.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/Lib/json-20220320.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/Lib/tinylog-api-2.4.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/Lib/tinylog-impl-2.4.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Lib/pngj-2.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Lib/flatlaf-2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Lib/json-20220320.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

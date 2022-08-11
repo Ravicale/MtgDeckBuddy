@@ -21,5 +21,10 @@
         <jarDirectory url="file://$MODULE_DIR$/Lib" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="formdev.flatlaf" level="project" />
+    <orderEntry type="library" name="json" level="project" />
+    <orderEntry type="library" name="tinylog.api" level="project" />
+    <orderEntry type="library" name="tinylog.impl" level="project" />
+    <orderEntry type="library" name="ar.hjg.pngj" level="project" />
   </component>
 </module>

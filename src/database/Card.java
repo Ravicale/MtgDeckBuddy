@@ -95,8 +95,9 @@ public class Card {
 
 		cardText = cardJson.optString("oracle_text", "").toLowerCase().trim();
 
+		//If invalid characters are being output here, then that means the project was not encoded with UTF-8!
 		name = new CardField<>(cardJson.getString("name"));
-		String typeline = cardJson.getString("type_line"); //TODO: Sort out encoding issues.
+		String typeline = cardJson.getString("type_line");
 		isPlayable = !typeline.contains("Card") && !typeline.contains("Token");
 		type = new CardField<>(typeline);
 		isBasicLand = typeline.contains("Basic Land");

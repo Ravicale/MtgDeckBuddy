@@ -22,6 +22,12 @@ bin/
 /nbdist/
 /.nb-gradle/
 
+### Misc Files ###
+bans/
+collection/
+decks/
+*.png
+
 ### VS Code ###
 .vscode/
 
