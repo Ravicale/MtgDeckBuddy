@@ -1,5 +1,6 @@
 package gui;
 
+import application.LogTags;
 import com.formdev.flatlaf.FlatDarkLaf;
 import database.Card;
 import gui.panes.CardFilterPane;
@@ -25,7 +26,7 @@ public class Gui {
 	}
 
 	public static void init() {
-		Logger.info("Initializing GUI.");
+		Logger.tag(LogTags.UI_SYNC.tag).info("Initializing GUI.");
 		FlatDarkLaf.setup();
 		SwingUtilities.invokeLater(() -> {
 			cardFilterGui = new CardFilterPane();
@@ -61,7 +62,7 @@ public class Gui {
 			frame.setMinimumSize(frame.getSize());
 			frame.setVisible(true);
 			guiAvailable.countDown();
-			Logger.info("GUI Initialized.");
+			Logger.tag(LogTags.UI_SYNC.tag).info("GUI Initialized.");
 		});
 	}
 
@@ -95,10 +96,16 @@ public class Gui {
 		SwingUtilities.invokeLater(() -> cardListGui.updateRow(id));
 	}
 
-	public static void lockDeck() {
+	public static void editDeck(Runnable action) {
+		lockDeck();
+		action.run();
+		unlockDeck();
+	}
+
+	private static void lockDeck() {
 		Object lock = new Object();
 		SwingUtilities.invokeLater(() -> {
-			Logger.info("Locking deck editing.");
+			Logger.tag(LogTags.UI_SYNC.tag).info("Locking deck editing.");
 			cardInfoGui.setEnableDeckEditing(false);
 			menuBar.setEnableDeckEditing(false);
 			cardListGui.setBusy(true);
@@ -115,10 +122,10 @@ public class Gui {
 		}
 	}
 
-	public static void unlockDeck() {
+	private static void unlockDeck() {
 		Object lock = new Object();
 		SwingUtilities.invokeLater(() -> {
-			Logger.info("Unlocking deck editing.");
+			Logger.tag(LogTags.UI_SYNC.tag).info("Unlocking deck editing.");
 			cardInfoGui.setEnableDeckEditing(true);
 			menuBar.setEnableDeckEditing(true);
 			cardListGui.setBusy(false);

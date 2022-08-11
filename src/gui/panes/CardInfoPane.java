@@ -1,5 +1,6 @@
 package gui.panes;
 
+import application.LogTags;
 import database.Card;
 import gui.Gui;
 import gui.UIConstants;
@@ -11,8 +12,8 @@ import java.awt.event.ActionEvent;
 
 public class CardInfoPane extends JPanel {
 
-	private final JLabel cardFrontImage = new JLabel(UIConstants.DEFAULT_CARD_IMAGE);
-	private final JLabel cardBackImage = new JLabel(UIConstants.DEFAULT_CARD_IMAGE);
+	private final JLabel cardFrontImage = new JLabel(UIConstants.DEFAULT_CARD_ICON);
+	private final JLabel cardBackImage = new JLabel(UIConstants.DEFAULT_CARD_ICON);
 	private final ImageToggleButton flipButton = new ImageToggleButton("flip", UIConstants.FLIP_BUTTON_SIZE);
 	private Card currentCard;
 	private final JButton addButton = new JButton("Add");
@@ -74,13 +75,13 @@ public class CardInfoPane extends JPanel {
 	}
 
 	public void setCard(Card card, ImageIcon front, ImageIcon back) {
-		Logger.info("Setting selected card to {} - #{} with {} and {}", card.getName(), card.id, front, back);
+		Logger.tag(LogTags.UI_UPDATES.tag).info("Setting selected card to {} - #{} with {} and {}", card.getName(), card.id, front, back);
 		if (front != null && back != null) {
 			flipButton.setVisible(true);
 		} else {
 			flipButton.setVisible(false);
-			front = front != null ? front : UIConstants.DEFAULT_CARD_IMAGE;
-			back = back != null ? back : UIConstants.DEFAULT_CARD_IMAGE;
+			front = front != null ? front : UIConstants.DEFAULT_CARD_ICON;
+			back = back != null ? back : UIConstants.DEFAULT_CARD_ICON;
 		}
 
 		flipButton.setSelected(false);
@@ -109,7 +110,7 @@ public class CardInfoPane extends JPanel {
 	}
 
 	private void addToDeck(ActionEvent actionEvent) {
-		Logger.info("Adding {} - #{} to deck.", currentCard.getName(), currentCard.id);
+		Logger.tag(LogTags.USER_INPUT.tag).info("Adding {} - #{} to deck.", currentCard.getName(), currentCard.id);
 		currentCard.addToDeck(1);
 		Gui.updateCardInfo(currentCard.id);
 		tryEnableAddButton();
@@ -117,7 +118,7 @@ public class CardInfoPane extends JPanel {
 	}
 
 	private void removeFromDeck(ActionEvent actionEvent) {
-		Logger.info("Removing {} - #{} from deck.", currentCard.getName(), currentCard.id);
+		Logger.tag(LogTags.USER_INPUT.tag).info("Removing {} - #{} from deck.", currentCard.getName(), currentCard.id);
 		currentCard.addToDeck(-1);
 		Gui.updateCardInfo(currentCard.id);
 		tryEnableAddButton();

@@ -7,30 +7,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="53935b6f-b924-4032-b0d1-517e5f4b63fd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/ar_hjg_pngj.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/formdev_flatlaf.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/json.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/tinylog_api.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/tinylog_impl.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lib/flatlaf-2.4-javadoc.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lib/pngj-2.1.0-javadoc.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lib/pngj-2.1.0-sources.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lib/pngj-2.1.0.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/application/LogTags.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/database/image/ImagePrefetchThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/MtgDeckBuddy_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/MtgDeckBuddy_jar.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib/flatlaf-2.3-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib/flatlaf-2.3-sources.jar" beforeDir="false" afterPath="$PROJECT_DIR$/Lib/flatlaf-2.4-sources.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib/flatlaf-2.3.jar" beforeDir="false" afterPath="$PROJECT_DIR$/Lib/flatlaf-2.4.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MtgDeckBuddy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/MtgDeckBuddy.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/carddb.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/carddb.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/database/image/ImageStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/application/MtgDeckBuddy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/application/MtgDeckBuddy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/Card.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/CardDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/CardDatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/ImageStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/image/ImageStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/ImageStore.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Gui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Gui.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/UIConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/UIConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/elements/ImageToggleButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/elements/ImageToggleButton.java" afterDir="false" />

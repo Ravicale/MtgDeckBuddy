@@ -1,5 +1,7 @@
 package database;
 
+import application.LogTags;
+import database.image.ImageStore;
 import gui.Gui;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,7 +12,10 @@ import javax.swing.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ObjIntConsumer;
 
@@ -46,21 +51,21 @@ public class CardDatabase {
 	public static void initCardDatabase() {
 		databaseWorkerThread.submit(() -> {
 			Thread.currentThread().setName("Card Database Worker");
-			Logger.trace("Initializing card database.");
+			Logger.tag(LogTags.DB_INIT.tag).info("Initializing card database.");
 			if (instance != null) {
-				Logger.warn("initCardDatabase called more than once!");
+				Logger.tag(LogTags.DB_INIT.tag).warn("initCardDatabase called more than once!");
 				return;
 			}
 
 			CardDatabase database = new CardDatabase();
 			InputStream databaseUri = CardDatabase.class.getClassLoader().getResourceAsStream("carddb.json");
 			if (databaseUri == null) {
-				Logger.error("Unable to load card database.");
+				Logger.tag(LogTags.DB_INIT.tag).error("Unable to load card database.");
 				return;
 			}
 
 			Gui.setBusyLoading(true);
-			Logger.info("Loading cards.");
+			Logger.tag(LogTags.DB_INIT.tag).info("Loading cards.");
 			database.cardDataList = new ArrayList<>(26042);
 			database.cardMap = new HashMap<>(26042);
 			database.deckList = Collections.synchronizedSet(new HashSet<>(100));
@@ -76,15 +81,16 @@ public class CardDatabase {
 					database.cardDataList.add(card);
 					database.cardMap.put(card.getName(), card);
 					cardNum++;
+					Logger.tag(LogTags.DB_INIT.tag).debug(() -> "Loaded card " + card.getName());
 				} catch (JSONException e) {
-					Logger.error(e, "Unable to create card #{}", cardNum);
+					Logger.tag(LogTags.DB_INIT.tag).error(e, "Unable to create card #{}", cardNum);
 					throw new RuntimeException("Unable to create card", e);
 				} catch (MalformedURLException e) {
-					Logger.error(e, "Scryfall reported an invalid URL in card #{}", cardNum);
+					Logger.tag(LogTags.DB_INIT.tag).error(e, "Scryfall reported an invalid URL in card #{}", cardNum);
 				}
 			}
 
-			Logger.info("Loaded {} cards. Updating GUI.", database.cardDataList.size());
+			Logger.tag(LogTags.DB_INIT.tag).info("Loaded {} cards. Updating GUI.", database.cardDataList.size());
 			instance = database;
 			databaseLoaded.countDown();
 
@@ -122,25 +128,25 @@ public class CardDatabase {
 	public static synchronized void loadAndDisplayImage(Card card) {
 		try {
 			databaseLoaded.await();
-
-			if (card == instance.previousCard) {
-				return;
-			}
-			instance.previousCard = card;
-
-			//Stop the previous request, since it's no longer relevant.
-			if (cardToLoad != null && !cardToLoad.isDone()) {
-				cardToLoad.cancel(true);
-			}
-
-			Gui.setSelectedCard(card, null, null);
 		} catch (InterruptedException e) {
-			Logger.error("Database not yet initialized. Thread waiting on it was interrupted.");
+			Logger.tag(LogTags.DB_ACTION.tag).error("Database not yet initialized. Thread waiting on it was interrupted.");
+			throw new RuntimeException(e);
 		}
+
+		if (card == instance.previousCard) {
+			return;
+		}
+		instance.previousCard = card;
+
+		//Stop the previous request, since it's no longer relevant.
+		if (cardToLoad != null && !cardToLoad.isDone()) {
+			cardToLoad.cancel(true);
+		}
+		Gui.setSelectedCard(card, null, null);
 
 		cardToLoad = databaseWorkerThread.submit(() -> {
 			try {
-				Logger.info("Requesting images for '{}'.", card.getName());
+				Logger.tag(LogTags.DB_ACTION.tag).info("Requesting images for '{}'.", card.getName());
 				Gui.setBusyLoading(true);
 				ImageIcon front = null;
 				ImageIcon back = null;
@@ -152,7 +158,7 @@ public class CardDatabase {
 				}
 				Gui.setSelectedCard(card, front, back);
 			} catch (InterruptedException e) {
-				Logger.info("Image loading interrupted.");
+				Logger.tag(LogTags.DB_ACTION.tag).info("Image loading interrupted.");
 			} finally {
 				Gui.setBusyLoading(false);
 			}
@@ -160,17 +166,23 @@ public class CardDatabase {
 	}
 
 	/**
+	 Helper method that applies the relevant wrapping for deck related ations to be run on its own thread with the
+	 proper UI synchronization.
+	 @param action The action being performed to edit the deck.
+	 */
+	private static void editDeck(Runnable action) {
+		databaseWorkerThread.submit(() -> Gui.editDeck(action));
+	}
+
+	/**
 	 Empties out the user's deck.
 	 */
 	public static void clearDeck() {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
-			Logger.info("Clearing deck.");
+		editDeck(() -> {
+			Logger.tag(LogTags.DB_ACTION.tag).info("Clearing deck.");
 			for (Card card : instance.cardDataList) {
 				card.setInDeck(0);
 			}
-			ImageStore.setDeckPrefetchList(Collections.emptyList());
-			Gui.unlockDeck();
 		});
 	}
 
@@ -178,13 +190,11 @@ public class CardDatabase {
 	 Empties out the user's collection.
 	 */
 	public static void clearCollection() {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
-			Logger.info("Clearing collection.");
+		editDeck(() -> {
+			Logger.tag(LogTags.DB_ACTION.tag).info("Clearing collection.");
 			for (Card card : instance.cardDataList) {
 				card.setOwned(0);
 			}
-			Gui.unlockDeck();
 		});
 	}
 
@@ -195,17 +205,15 @@ public class CardDatabase {
 	public static void readCollection(File file) {
 		File[] files = file.isDirectory() ? file.listFiles((f) -> f.getName().endsWith(".dec")) : new File[]{file};
 		if (files == null || files.length == 0) {
-			Logger.warn("No .dec files found inside of '{}'.", file.getAbsolutePath());
+			Logger.tag(LogTags.DB_ACTION.tag).warn("No .dec files found inside of '{}'.", file.getAbsolutePath());
 			JOptionPane.showMessageDialog(Gui.getFrame(), "No .dec files found inside of selected folder.");
 			return;
 		}
 
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
+		editDeck(() -> {
 			for (File f : files) {
 				instance.readDecFile(f, Card::addOwned);
 			}
-			Gui.unlockDeck();
 		});
 	}
 
@@ -214,8 +222,7 @@ public class CardDatabase {
 	 @param file The list of banned cards.
 	 */
 	public static synchronized void readBans(File file) {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
+		editDeck(() -> {
 			for (Card card : instance.cardDataList) {
 				card.banned = false;
 			}
@@ -224,7 +231,6 @@ public class CardDatabase {
 				card.banned = true;
 				card.setInDeck(0);
 			});
-			Gui.unlockDeck();
 		});
 	}
 
@@ -233,12 +239,7 @@ public class CardDatabase {
 	 @param file The file containing the user's deck.
 	 */
 	public static synchronized void readDeck(File file) {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
-			instance.readDecFile(file, Card::addToDeck);
-			ImageStore.setDeckPrefetchList(instance.deckList);
-			Gui.unlockDeck();
-		});
+		editDeck(() -> instance.readDecFile(file, Card::addToDeck));
 	}
 
 	/**
@@ -246,12 +247,10 @@ public class CardDatabase {
 	 @param file The file to write to.
 	 */
 	public static synchronized void saveDeck(File file) {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
+		editDeck(() -> {
 			if (instance.deckSize.get() == 0) {
-				Logger.info("User attempted to save an empty deck.");
+				Logger.tag(LogTags.DB_ACTION.tag).info("User attempted to save an empty deck.");
 				JOptionPane.showMessageDialog(Gui.getFrame(), "Your deck is currently empty.");
-				Gui.unlockDeck();
 				return;
 			}
 
@@ -264,9 +263,7 @@ public class CardDatabase {
 				}
 				Gui.setBusyLoading(false);
 			} catch (IOException e) {
-				Logger.error("Unable to write deck to {}", file.getAbsolutePath());
-			} finally {
-				Gui.unlockDeck();
+				Logger.tag(LogTags.DB_ACTION.tag).error("Unable to write deck to {}", file.getAbsolutePath());
 			}
 		});
 	}
@@ -276,15 +273,13 @@ public class CardDatabase {
 	 @param file The file to write to. Will have incremental numbers to handle overflow + backfaces.
 	 */
 	public static void saveDeckImage(File file) {
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
-			if (instance.deckSize.get() == 0) {
-				Logger.info("User attempted to save an empty deck.");
+		editDeck(() -> {
+			if (instance.deckSize.get() <= 0) {
+				Logger.tag(LogTags.DB_ACTION.tag).info("User attempted to save an empty deck.");
 				JOptionPane.showMessageDialog(Gui.getFrame(), "Your deck is currently empty.");
 			} else {
 				ImageStore.writeDeckImage(instance.deckList, instance.deckSize.get(), file);
 			}
-			Gui.unlockDeck();
 		});
 	}
 
@@ -292,14 +287,11 @@ public class CardDatabase {
 	 Adds 99 copies of every card to the user's collection.
 	 */
 	public static void fillCollection() {
-		Logger.info("Filling collection.");
-		databaseWorkerThread.submit(() -> {
-			Gui.lockDeck();
-			Logger.info("Filling collection.");
+		editDeck(() -> {
+			Logger.tag(LogTags.DB_ACTION.tag).info("Filling collection.");
 			for (Card card : instance.cardDataList) {
 				card.setOwned(99);
 			}
-			Gui.unlockDeck();
 		});
 	}
 
@@ -310,7 +302,7 @@ public class CardDatabase {
 	 @param action Action to perform for every card.
 	 */
 	private void readDecFile(File file, ObjIntConsumer<Card> action) {
-		Logger.info("Reading collection file at '{}'.", file.getAbsolutePath());
+		Logger.tag(LogTags.DB_ACTION.tag).info("Reading collection file at '{}'.", file.getAbsolutePath());
 		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 			long lineNum = 0;
 			String line;
@@ -325,15 +317,15 @@ public class CardDatabase {
 						if (card != null) {
 							action.accept(card, count);
 						} else {
-							Logger.error("Unable to find card named {} in database!", name);
+							Logger.tag(LogTags.DB_ACTION.tag).error("Unable to find card named {} in database!", name);
 						}
 					}
 				} catch (NumberFormatException e) {
-					Logger.error(e, "Unable to read number of cards in line {} or {}", lineNum, file.getName());
+					Logger.tag(LogTags.DB_ACTION.tag).error(e, "Unable to read number of cards in line {} or {}", lineNum, file.getName());
 				}
 			}
 		} catch (IOException e) {
-			Logger.error(e, "Error while reading file {}.", file.getName());
+			Logger.tag(LogTags.DB_ACTION.tag).error(e, "Error while reading file {}.", file.getName());
 		}
 	}
 
@@ -346,7 +338,8 @@ public class CardDatabase {
 		try {
 			databaseLoaded.await();
 		} catch (InterruptedException e) {
-			Logger.error("Database not yet initialized. Thread waiting on it was interrupted.");
+			Logger.tag(LogTags.DB_ACTION.tag).error("Database not yet initialized. Thread waiting on it was interrupted.");
+			throw new RuntimeException(e);
 		}
 
 		return instance.cardDataList.get(index);

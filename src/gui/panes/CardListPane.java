@@ -1,8 +1,9 @@
 package gui.panes;
 
+import application.LogTags;
 import database.Card;
 import database.CardDatabase;
-import database.ImageStore;
+import database.image.ImagePrefetchThread;
 import gui.UIConstants;
 import gui.panes.models.CardTableFilter;
 import gui.panes.models.CardTableModel;
@@ -99,13 +100,15 @@ public class CardListPane extends JPanel {
 			int visibleRows = cardTable.rowAtPoint(viewport.getLocation()) - firstRow;
 			int lastRow = (visibleRows > 0) ? visibleRows+firstRow : cardTable.getRowCount() - 1;
 			List<Card> visibleCards = new ArrayList<>(lastRow - firstRow);
-			Logger.debug("First row = {}, Visible rows = {}, Last row = {}", firstRow, visibleRows, lastRow);
+			Logger.tag(LogTags.PREFETCH.tag).debug(
+					"Requesting prefetch for rows:\n\tFirst row = {},\n\tVisible rows = {},\n\tLast row = {}",
+					firstRow, visibleRows, lastRow);
 			for(int row=firstRow; row <= lastRow; row++) {
 				int id = cardTable.convertRowIndexToModel(row);
 				visibleCards.add(CardDatabase.getCard(id));
 			}
 
-			ImageStore.setPrefetchList(visibleCards);
+			ImagePrefetchThread.setPrefetchList(visibleCards);
 		}
 	}
 
@@ -140,19 +143,19 @@ public class CardListPane extends JPanel {
 
 	public void updateRow(int id) {
 		if (model != null) {
-			Logger.debug("Updating table row for card #{}.", id);
+			Logger.tag(LogTags.UI_UPDATES.tag).debug("Updating table row for card #{}.", id);
 			model.fireTableRowsUpdated(id, id);
 		} else {
-			Logger.error("Attempted to update a card row when the model has not been fully initialized.");
+			Logger.tag(LogTags.UI_UPDATES.tag).error("Attempted to update a card row when the model has not been fully initialized.");
 		}
 	}
 
 	public void updateTable() {
 		if (model != null) {
-			Logger.debug("Updating table for all cards.");
+			Logger.tag(LogTags.UI_UPDATES.tag).debug("Updating table for all cards.");
 			model.fireTableDataChanged();
 		} else {
-			Logger.error("Attempted to update a the card table when the model has not been fully initialized.");
+			Logger.tag(LogTags.UI_UPDATES.tag).error("Attempted to update a the card table when the model has not been fully initialized.");
 		}
 	}
 }

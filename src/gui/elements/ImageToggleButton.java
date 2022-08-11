@@ -1,7 +1,7 @@
 package gui.elements;
 
 import database.CardColor;
-import database.ImageStore;
+import database.image.ImageStore;
 import gui.UIConstants;
 
 import javax.swing.*;
@@ -30,12 +30,12 @@ public class ImageToggleButton extends JToggleButton {
 
 		//Initialize icons.
 		String iconPath = "images/buttonicons/" + name + "/";
-		normalIcon = ImageStore.getLocal(iconPath + RAISED_ICON, size);
+		normalIcon = ImageStore.getLocalIcon(iconPath + RAISED_ICON, size);
 		setIcon(normalIcon);
-		selectedIcon = ImageStore.getLocal(iconPath + PRESSED_ICON, size);
+		selectedIcon = ImageStore.getLocalIcon(iconPath + PRESSED_ICON, size);
 		setSelectedIcon(selectedIcon);
-		hoverIcon = ImageStore.getLocal(iconPath + RAISED_HOVER_ICON, size);
-		selectedHoverIcon = ImageStore.getLocal(iconPath + PRESSED_HOVER_ICON, size);
+		hoverIcon = ImageStore.getLocalIcon(iconPath + RAISED_HOVER_ICON, size);
+		selectedHoverIcon = ImageStore.getLocalIcon(iconPath + PRESSED_HOVER_ICON, size);
 
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseEntered(java.awt.event.MouseEvent evt) {

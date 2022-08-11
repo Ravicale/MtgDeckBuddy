@@ -1,6 +1,6 @@
 package gui;
 
-import database.ImageStore;
+import database.image.ImageStore;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +11,7 @@ public class UIConstants {
 	//Card Info Pane
 	public static final Dimension CARD_INFO_PANE_SIZE = new Dimension(320, 420);
 	public static final Dimension CARD_IMAGE_SIZE = new Dimension(288, 408);
-	public static final ImageIcon DEFAULT_CARD_IMAGE = ImageStore.getLocal("images/defaultcardback.jpg", CARD_IMAGE_SIZE);
+	public static final ImageIcon DEFAULT_CARD_ICON = ImageStore.getLocalIcon("images/defaultcardback.jpg", CARD_IMAGE_SIZE);
 	public static final Dimension FLIP_BUTTON_SIZE = new Dimension(30, 30);
 	public static final Dimension CARD_BUTTON_SIZE = new Dimension(125, 50);
 

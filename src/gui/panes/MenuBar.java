@@ -1,5 +1,6 @@
 package gui.panes;
 
+import application.LogTags;
 import database.CardDatabase;
 import gui.Gui;
 import gui.panes.models.CardTableFilter;
@@ -116,7 +117,7 @@ public class MenuBar extends JMenuBar {
 			if (selection.canRead()) {
 				action.accept(selection);
 			} else {
-				Logger.warn("Could not read file '{}'.", selection.getAbsolutePath());
+				Logger.tag(LogTags.USER_INPUT.tag).warn("Could not read file '{}'.", selection.getAbsolutePath());
 				JOptionPane.showMessageDialog(Gui.getFrame(), "Could not read file.");
 			}
 		}
@@ -129,14 +130,14 @@ public class MenuBar extends JMenuBar {
 		int result = fileChooser.showSaveDialog(Gui.getFrame());
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File selection = fileChooser.getSelectedFile();
-			Logger.info("Attempting to export deck to '{}'", selection.getAbsolutePath());
+			Logger.tag(LogTags.USER_INPUT.tag).info("Attempting to export deck to '{}'", selection.getAbsolutePath());
 			if (!selection.getName().endsWith(extension)) {
 				selection = new File(selection.getAbsolutePath() + extension);
 			}
 
 			if (selection.exists()) {
 				if (!selection.delete()) {
-					Logger.warn("Could not remove exististing file '{}'.", selection.getAbsolutePath());
+					Logger.tag(LogTags.USER_INPUT.tag).warn("Could not remove exististing file '{}'.", selection.getAbsolutePath());
 					JOptionPane.showMessageDialog(Gui.getFrame(), "Could not remove exististing file.");
 					return;
 				}
@@ -145,7 +146,7 @@ public class MenuBar extends JMenuBar {
 			if (selection.getParentFile().canWrite()) {
 				action.accept(selection);
 			} else {
-				Logger.warn("Unable to write to selected file at '{}'.", selection.getAbsolutePath());
+				Logger.tag(LogTags.USER_INPUT.tag).warn("Unable to write to selected file at '{}'.", selection.getAbsolutePath());
 				JOptionPane.showMessageDialog(Gui.getFrame(), "No write permissions for selected file.");
 			}
 		}
