@@ -33,7 +33,7 @@ public enum LogTags {
 		level = levelName;
 	}
 
-	private static final boolean WRITE_TO_FILE = false;
+	private static final boolean WRITE_TO_FILE = true;
 	public static void configureLogging() {
 		if (WRITE_TO_FILE) {
 			org.tinylog.configuration.Configuration.set("writer", "file");

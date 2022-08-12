@@ -21,6 +21,7 @@ public class Gui {
 	private static JFrame frame;
 
 	private static final CountDownLatch guiAvailable = new CountDownLatch(1);
+	private static boolean isDeckLocked = false;
 
 	private Gui() {
 	}
@@ -69,7 +70,7 @@ public class Gui {
 	public static void setBusyLoading(boolean isBusy) {
 		SwingUtilities.invokeLater(() -> {
 			if (guiAvailable.getCount() == 0) {
-				cardListGui.setBusy(isBusy);
+				cardListGui.setBusy(isBusy || isDeckLocked);
 			} else {
 				setBusyLoading(isBusy);
 			}
@@ -106,6 +107,7 @@ public class Gui {
 		Object lock = new Object();
 		SwingUtilities.invokeLater(() -> {
 			Logger.tag(LogTags.UI_SYNC.tag).info("Locking deck editing.");
+			isDeckLocked = true;
 			cardInfoGui.setEnableDeckEditing(false);
 			menuBar.setEnableDeckEditing(false);
 			cardListGui.setBusy(true);
@@ -126,6 +128,7 @@ public class Gui {
 		Object lock = new Object();
 		SwingUtilities.invokeLater(() -> {
 			Logger.tag(LogTags.UI_SYNC.tag).info("Unlocking deck editing.");
+			isDeckLocked = false;
 			cardInfoGui.setEnableDeckEditing(true);
 			menuBar.setEnableDeckEditing(true);
 			cardListGui.setBusy(false);

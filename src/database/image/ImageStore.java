@@ -21,7 +21,7 @@ public class ImageStore {
 	}
 
 	private static final long MIN_REQUEST_DELAY = 100;
-	private static final int MAX_CACHED_IMAGES = 60;
+	static final int MAX_CACHED_IMAGES = 60;
 	private static BufferedImage defaultCardBack;
 	private static final Map<String, BufferedImage> remoteImageCache = new WeakHashMap<>(MAX_CACHED_IMAGES);
 	private static final Set<String> cachedImageList = Collections.newSetFromMap(new LinkedHashMap<String, Boolean>() {
@@ -152,12 +152,11 @@ public class ImageStore {
 					firstCard = false;
 				}
 
-				//Each loop iteration writes a png.
+				//Each loop iteration writes a png 'page'.
 				{
 					File currFile = new File(parentPath + baseFilename + (writeFlipped ? "_back_" : "_") + pageNum++ + ext);
 					Logger.tag(LogTags.DECK_IMAGE.tag).info("Writing to {}", filepath.getName());
 					currDeckImage = new PngWriter(currFile, imageInfo);
-					currDeckImage.getPixelsWriter().setDeflaterCompLevel(9);
 				}
 
 				//Whenever we reach a row the current cards don't extend into, get the new active buffers.
@@ -166,9 +165,10 @@ public class ImageStore {
 					if (y % CARD_SIZE_Y == 0) {
 						Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting image buffers.");
 						for (int index = 0; index < CARDS_X; index++) {
-							if (card == null && !lastCardOnPage) {
+							if (card == null && !lastCardOnPage) { //When out of cards, clear buffers and print blackspace.
 								Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting null buffer.");
 								activeBuffers[index] = null;
+							//Print a card back as the last card on a given page to avoid play issues with dual face cards.
 							} else if (lastCardOnPage || (y == IMAGE_SIZE_Y - CARD_SIZE_Y && index + 1 == CARDS_X)) {
 								Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting buffer for default card back.");
 								activeBuffers[index] = defaultCardBack.getRaster().getDataBuffer();

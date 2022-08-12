@@ -1,6 +1,7 @@
 package database;
 
 import application.LogTags;
+import database.image.ImagePrefetchThread;
 import database.image.ImageStore;
 import gui.Gui;
 import org.json.JSONException;
@@ -115,6 +116,9 @@ public class CardDatabase {
 		}
 
 		Gui.setDeckSize(instance.deckSize.addAndGet(curr - prev));
+		//TODO: Make UI interface with database for adding/removing cards rather than directly interacting with cards.
+		//Will enable more efficient handling of deck prefetching.
+		ImagePrefetchThread.setDeckPrefetchList(instance.deckList);
 	}
 
 	/**
@@ -183,6 +187,7 @@ public class CardDatabase {
 			for (Card card : instance.cardDataList) {
 				card.setInDeck(0);
 			}
+			//ImagePrefetchThread.setDeckPrefetchList(instance.deckList);
 		});
 	}
 
@@ -239,7 +244,10 @@ public class CardDatabase {
 	 @param file The file containing the user's deck.
 	 */
 	public static synchronized void readDeck(File file) {
-		editDeck(() -> instance.readDecFile(file, Card::addToDeck));
+		editDeck(() -> {
+			instance.readDecFile(file, Card::addToDeck);
+			//ImagePrefetchThread.setDeckPrefetchList(instance.deckList);
+		});
 	}
 
 	/**

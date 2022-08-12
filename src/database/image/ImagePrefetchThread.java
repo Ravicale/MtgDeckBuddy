@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class ImagePrefetchThread {
 	private static final Deque<Card> guiPrefetchQueue = new LinkedBlockingDeque<>();
+	private static final Deque<Card> deckPrefetchQueue = new LinkedBlockingDeque<>();
 	private static final Object imagePrefetchActive = new Object();
 	@SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
 	//No it cannot, since disabling it will result in unreachable code errors.
@@ -18,14 +19,31 @@ public class ImagePrefetchThread {
 		while (ENABLE_PREFETCHING) {
 			try {
 				Logger.tag(LogTags.PREFETCH.tag).info("Prefetching cards.");
-				while (!guiPrefetchQueue.isEmpty()) {
+				//No point trying to prefetch more images than can be cached.
+				int prefetchPool = ImageStore.MAX_CACHED_IMAGES;
+				while (!guiPrefetchQueue.isEmpty() && prefetchPool > 0) {
 					Card currentCard = guiPrefetchQueue.pop();
-					Logger.tag(LogTags.PREFETCH.tag).trace("Prefetching card {}.", currentCard.getName());
+					Logger.tag(LogTags.PREFETCH.tag).trace("Prefetching card for gui {}.", currentCard.getName());
 					if (currentCard.frontImageUrl != null) {
 						ImageStore.getImageFromScryfall(currentCard.frontImageUrl);
+						prefetchPool--;
 					}
 					if (currentCard.backImageUrl != null) {
 						ImageStore.getImageFromScryfall(currentCard.backImageUrl);
+						prefetchPool--;
+					}
+				}
+
+				while (!deckPrefetchQueue.isEmpty() && prefetchPool > 0) {
+					Card currentCard = deckPrefetchQueue.pop();
+					Logger.tag(LogTags.PREFETCH.tag).trace("Prefetching card for deck {}.", currentCard.getName());
+					if (currentCard.frontImageUrl != null) {
+						ImageStore.getImageFromScryfall(currentCard.frontImageUrl);
+						prefetchPool--;
+					}
+					if (currentCard.backImageUrl != null) {
+						ImageStore.getImageFromScryfall(currentCard.backImageUrl);
+						prefetchPool--;
 					}
 				}
 
@@ -44,11 +62,18 @@ public class ImagePrefetchThread {
 	static {
 		prefetchThread.setName("Image Prefetcher");
 		prefetchThread.start();
+		prefetchThread.setPriority(1);
 	}
 
 	public static void setPrefetchList(Collection<Card> cards) {
 		guiPrefetchQueue.clear();
 		guiPrefetchQueue.addAll(cards);
+		prefetchThread.interrupt();
+	}
+
+	public static void setDeckPrefetchList(Collection<Card> cards) {
+		deckPrefetchQueue.clear();
+		deckPrefetchQueue.addAll(cards);
 		prefetchThread.interrupt();
 	}
 }
