@@ -7,18 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="53935b6f-b924-4032-b0d1-517e5f4b63fd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/application/LogTags.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/database/image/ImagePrefetchThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/database/image/ImageStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/application/MtgDeckBuddy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/application/MtgDeckBuddy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/CardDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/CardDatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/ImageStore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/Gui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Gui.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/UIConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/UIConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/elements/ImageToggleButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/elements/ImageToggleButton.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/panes/CardInfoPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/panes/CardInfoPane.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/panes/CardListPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/panes/CardListPane.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/panes/MenuBar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/panes/MenuBar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/image/ImageStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/image/ImageStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

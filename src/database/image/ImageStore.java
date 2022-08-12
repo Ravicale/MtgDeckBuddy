@@ -129,14 +129,15 @@ public class ImageStore {
 	public static synchronized void writeDeckImage(Iterable<Card> cards, int deckSize, File filepath) {
 		PngWriter currDeckImage = null;
 		try {
-			Logger.info("Writing new deck image with {} cards.", deckSize);
+			Logger.tag(LogTags.DECK_IMAGE.tag).info("Writing new deck image with {} cards.", deckSize);
 
 			final ImageInfo imageInfo = new ImageInfo(IMAGE_SIZE_X, IMAGE_SIZE_Y, 8, false);
 			final ImageLineInt writerLine = new ImageLineInt(imageInfo);
 			final DataBuffer[] activeBuffers = new DataBuffer[CARDS_X];
 
+			boolean firstCard = true;
 			Iterator<Card> cardIterator = cards.iterator();
-			Card card = cardIterator.next();
+			Card card = null;
 			int currCardCopy = 0;
 			boolean writeFlipped = false;
 
@@ -146,49 +147,55 @@ public class ImageStore {
 			final String ext = filepath.getName().substring(filepath.getName().lastIndexOf('.'));
 
 			while (cardIterator.hasNext()) {
+				if (firstCard) {
+					card = cardIterator.next();
+					firstCard = false;
+				}
+
 				//Each loop iteration writes a png.
 				{
 					File currFile = new File(parentPath + baseFilename + (writeFlipped ? "_back_" : "_") + pageNum++ + ext);
 					Logger.tag(LogTags.DECK_IMAGE.tag).info("Writing to {}", filepath.getName());
 					currDeckImage = new PngWriter(currFile, imageInfo);
-					currDeckImage.setFilterType(FilterType.FILTER_NONE);
+					currDeckImage.getPixelsWriter().setDeflaterCompLevel(9);
 				}
 
 				//Whenever we reach a row the current cards don't extend into, get the new active buffers.
+				boolean lastCardOnPage = false;
 				for (int y = 0; y < IMAGE_SIZE_Y; y++) {
 					if (y % CARD_SIZE_Y == 0) {
 						Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting image buffers.");
 						for (int index = 0; index < CARDS_X; index++) {
-							if (!(y == IMAGE_SIZE_Y - CARD_SIZE_Y && index + 1 == CARDS_X)) {
-								if (card != null) {
-									Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting buffer for card {}", card.getName());
-
-									BufferedImage image = null;
-									URL imageUrl = writeFlipped ? card.backImageUrl : card.frontImageUrl;
-									if (imageUrl != null) {
-										image = getImageFromScryfall(writeFlipped ? card.backImageUrl : card.frontImageUrl);
-									}
-									if (image == null) {
-										image = defaultCardBack;
-									}
-
-									activeBuffers[index] = image.getRaster().getDataBuffer();
-									currCardCopy++;
-									if (currCardCopy >= card.copiesInDeck()) {
-										if (cardIterator.hasNext()) {
-											card = cardIterator.next();
-											currCardCopy = 0;
-										} else {
-											card = null;
-										}
-									}
-								} else {
-									Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting null buffer.");
-									activeBuffers[index] = null;
-								}
-							} else {
+							if (card == null && !lastCardOnPage) {
+								Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting null buffer.");
+								activeBuffers[index] = null;
+							} else if (lastCardOnPage || (y == IMAGE_SIZE_Y - CARD_SIZE_Y && index + 1 == CARDS_X)) {
 								Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting buffer for default card back.");
 								activeBuffers[index] = defaultCardBack.getRaster().getDataBuffer();
+								lastCardOnPage = false;
+							} else {
+								Logger.tag(LogTags.DECK_IMAGE.tag).debug("Getting buffer for card {}", card.getName());
+
+								BufferedImage image = null;
+								URL imageUrl = writeFlipped ? card.backImageUrl : card.frontImageUrl;
+								if (imageUrl != null) {
+									image = getImageFromScryfall(writeFlipped ? card.backImageUrl : card.frontImageUrl);
+								}
+								if (image == null) {
+									image = defaultCardBack;
+								}
+
+								activeBuffers[index] = image.getRaster().getDataBuffer();
+								currCardCopy++;
+								if (currCardCopy >= card.copiesInDeck()) {
+									if (cardIterator.hasNext()) {
+										card = cardIterator.next();
+										currCardCopy = 0;
+									} else {
+										card = null;
+										lastCardOnPage = true;
+									}
+								}
 							}
 						}
 					}
@@ -205,8 +212,8 @@ public class ImageStore {
 								writerLine.getScanline()[outIndex + 2] = cardBuffer.getElem(cardIndex);        //B
 							}
 						} else {
-							for (int x = 0; x < CARD_SIZE_X * 3; x++) {
-								writerLine.getScanline()[x + cardX * CARD_SIZE_X] = 0;
+							for (int x = 3 * cardX * CARD_SIZE_X; x < 3 * (cardX * CARD_SIZE_X + CARD_SIZE_X); x++) {
+								writerLine.getScanline()[x] = 0;
 							}
 						}
 					}
@@ -219,8 +226,9 @@ public class ImageStore {
 					Logger.tag(LogTags.DECK_IMAGE.tag).info("Flipping cards.");
 					writeFlipped = true;
 					cardIterator = cards.iterator();
-					card = cardIterator.next();
+					firstCard = true;
 					currCardCopy = 0;
+					pageNum = 0;
 				}
 			}
 			currDeckImage = null;
