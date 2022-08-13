@@ -1,7 +1,8 @@
 package application;
 
 public enum LogTags {
-	DECK_IMAGE("Deck Image", LogLevel.TRACE),
+	//TODO: Add support to override the default settings with a config file.
+	DECK_IMAGE("Deck Image", LogLevel.INFO),
 	PREFETCH ("Prefetch", LogLevel.WARN),
 	IMAGE_LOAD("Image Loading", LogLevel.INFO),
 	DB_INIT("Database Init", LogLevel.WARN),
