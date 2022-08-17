@@ -21,8 +21,8 @@ public class ImagePrefetchThread {
 				Logger.tag(LogTags.PREFETCH.tag).info("Prefetching cards.");
 				//No point trying to prefetch more images than can be cached.
 				int prefetchPool = ImageStore.MAX_CACHED_IMAGES;
-				while (!guiPrefetchQueue.isEmpty() && prefetchPool > 0) {
-					Card currentCard = guiPrefetchQueue.pop();
+				Card currentCard = guiPrefetchQueue.poll();
+				while (currentCard != null && prefetchPool > 0) {
 					Logger.tag(LogTags.PREFETCH.tag).trace("Prefetching card for gui {}.", currentCard.getName());
 					if (currentCard.frontImageUrl != null) {
 						ImageStore.getImageFromScryfall(currentCard.frontImageUrl);
@@ -32,10 +32,11 @@ public class ImagePrefetchThread {
 						ImageStore.getImageFromScryfall(currentCard.backImageUrl);
 						prefetchPool--;
 					}
+					currentCard = guiPrefetchQueue.poll();
 				}
 
-				while (!deckPrefetchQueue.isEmpty() && prefetchPool > 0) {
-					Card currentCard = deckPrefetchQueue.pop();
+				currentCard = deckPrefetchQueue.poll();
+				while (currentCard != null && prefetchPool > 0) {
 					Logger.tag(LogTags.PREFETCH.tag).trace("Prefetching card for deck {}.", currentCard.getName());
 					if (currentCard.frontImageUrl != null) {
 						ImageStore.getImageFromScryfall(currentCard.frontImageUrl);
@@ -45,6 +46,7 @@ public class ImagePrefetchThread {
 						ImageStore.getImageFromScryfall(currentCard.backImageUrl);
 						prefetchPool--;
 					}
+					currentCard = deckPrefetchQueue.poll();
 				}
 
 				Logger.tag(LogTags.PREFETCH.tag).info("Prefetching complete.");
