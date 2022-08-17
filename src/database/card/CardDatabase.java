@@ -1,4 +1,4 @@
-package database;
+package database.card;
 
 import application.LogTags;
 import database.image.ImagePrefetchThread;

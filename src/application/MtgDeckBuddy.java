@@ -1,6 +1,6 @@
 package application;
 
-import database.CardDatabase;
+import database.card.CardDatabase;
 import gui.Gui;
 
 public class MtgDeckBuddy {

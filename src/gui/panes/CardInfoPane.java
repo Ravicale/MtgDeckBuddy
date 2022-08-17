@@ -1,7 +1,7 @@
 package gui.panes;
 
 import application.LogTags;
-import database.Card;
+import database.card.Card;
 import gui.Gui;
 import gui.UIConstants;
 import gui.elements.ImageToggleButton;

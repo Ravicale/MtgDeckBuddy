@@ -2,7 +2,7 @@ package database.image;
 
 import application.LogTags;
 import ar.com.hjg.pngj.*;
-import database.Card;
+import database.card.Card;
 import gui.UIConstants;
 import org.tinylog.Logger;
 

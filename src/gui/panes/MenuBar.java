@@ -1,7 +1,7 @@
 package gui.panes;
 
 import application.LogTags;
-import database.CardDatabase;
+import database.card.CardDatabase;
 import gui.Gui;
 import gui.panes.models.CardTableFilter;
 import org.tinylog.Logger;

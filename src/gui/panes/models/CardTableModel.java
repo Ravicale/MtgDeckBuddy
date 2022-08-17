@@ -1,7 +1,7 @@
 package gui.panes.models;
 
-import database.Card;
-import database.CardDatabase;
+import database.card.Card;
+import database.card.CardDatabase;
 
 import javax.swing.table.AbstractTableModel;
 

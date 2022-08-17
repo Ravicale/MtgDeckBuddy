@@ -1,9 +1,9 @@
 package gui.panes.models;
 
 
-import database.Card;
-import database.CardColor;
-import database.CardDatabase;
+import database.card.Card;
+import database.card.CardColor;
+import database.card.CardDatabase;
 import gui.Gui;
 
 import javax.swing.*;

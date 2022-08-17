@@ -1,7 +1,7 @@
 package database.image;
 
 import application.LogTags;
-import database.Card;
+import database.card.Card;
 import org.tinylog.Logger;
 
 import java.util.Collection;

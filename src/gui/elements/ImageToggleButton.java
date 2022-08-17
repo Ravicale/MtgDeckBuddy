@@ -1,6 +1,6 @@
 package gui.elements;
 
-import database.CardColor;
+import database.card.CardColor;
 import database.image.ImageStore;
 import gui.UIConstants;
 

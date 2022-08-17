@@ -1,6 +1,6 @@
-package database;
+package database.card;
 
-public class CardField<T> implements Comparable<T> {
+class CardField<T> implements Comparable<T> {
 	public final Comparable<T> data; //Value to use for table sorting.
 	public final String string; //String to display in the table.
 

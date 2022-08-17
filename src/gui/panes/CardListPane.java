@@ -1,8 +1,8 @@
 package gui.panes;
 
 import application.LogTags;
-import database.Card;
-import database.CardDatabase;
+import database.card.Card;
+import database.card.CardDatabase;
 import database.image.ImagePrefetchThread;
 import gui.UIConstants;
 import gui.panes.models.CardTableFilter;

@@ -1,7 +1,7 @@
 package gui.panes;
 
-import database.Card;
-import database.CardColor;
+import database.card.Card;
+import database.card.CardColor;
 import gui.UIConstants;
 import gui.elements.ImageToggleButton;
 import gui.elements.SearchBox;

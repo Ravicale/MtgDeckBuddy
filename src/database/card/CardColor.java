@@ -1,4 +1,4 @@
-package database;
+package database.card;
 
 public enum CardColor {
 	WHITE("white", "W"),

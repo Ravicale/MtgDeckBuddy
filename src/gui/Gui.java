@@ -2,7 +2,7 @@ package gui;
 
 import application.LogTags;
 import com.formdev.flatlaf.FlatDarkLaf;
-import database.Card;
+import database.card.Card;
 import gui.panes.CardFilterPane;
 import gui.panes.CardInfoPane;
 import gui.panes.CardListPane;

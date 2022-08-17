@@ -1,4 +1,4 @@
-package database;
+package database.card;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,8 +40,8 @@ public class Card {
 	/** Used by get() for JTables. */
 	public static final int IN_DECK = 6;
 
-	private final CardField<String> name;
-	private final CardField<String> type;
+	private final String name;
+	private final String type;
 	private final CardField<Double> mana;
 	private final CardField<Float> powerOrLoyalty;
 	private final CardField<Float> toughness;
@@ -96,10 +96,10 @@ public class Card {
 		cardText = cardJson.optString("oracle_text", "").toLowerCase().trim();
 
 		//If invalid characters are being output here, then that means the project was not encoded with UTF-8!
-		name = new CardField<>(cardJson.getString("name"));
+		name = cardJson.getString("name");
 		String typeline = cardJson.getString("type_line");
 		isPlayable = !typeline.contains("Card") && !typeline.contains("Token");
-		type = new CardField<>(typeline);
+		type = typeline;
 		isBasicLand = typeline.contains("Basic Land");
 
 		double cmc = cardJson.getDouble("cmc");
@@ -185,12 +185,12 @@ public class Card {
 
 	/** @return The name of the card. */
 	public String getName() {
-		return name.toString();
+		return name;
 	}
 
 	/** @return The typeline of the card. */
 	public String getType() {
-		return type.toString();
+		return type;
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class Card {
 	 * @param value  The type of field that's desired.
 	 * @return       The desired CardField.
 	 */
-	public CardField<?> get(int value) {
+	public Comparable<?> get(int value) {
 		switch (value) {
 			case NAME:
 				return name;
