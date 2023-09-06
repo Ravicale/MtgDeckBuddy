@@ -110,7 +110,8 @@ public class ImageStore {
 			image = ImageIO.read(imageUrl);
 			Logger.tag(LogTags.IMAGE_LOAD.tag).info("Loaded image from Scryfall '{}'.", urlString);
 		} catch (IOException e) {
-			Logger.tag(LogTags.IMAGE_LOAD.tag).warn("Unable to load image '{}'", imageUrl);
+			Logger.tag(LogTags.IMAGE_LOAD.tag).warn("Unable to load image '{}':\n{}", imageUrl);
+			e.printStackTrace();
 			return null;
 		}
 

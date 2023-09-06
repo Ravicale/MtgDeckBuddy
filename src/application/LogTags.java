@@ -4,7 +4,7 @@ public enum LogTags {
 	//TODO: Add support to override the default settings with a config file.
 	DECK_IMAGE("Deck Image", LogLevel.INFO),
 	PREFETCH ("Prefetch", LogLevel.WARN),
-	IMAGE_LOAD("Image Loading", LogLevel.INFO),
+	IMAGE_LOAD("Image Loading", LogLevel.TRACE),
 	DB_INIT("Database Init", LogLevel.WARN),
 	DB_ACTION("Database Action", LogLevel.WARN),
 	USER_INPUT("User Input", LogLevel.INFO),
@@ -34,7 +34,6 @@ public enum LogTags {
 		level = levelName;
 	}
 
-	private static final boolean WRITE_TO_FILE = true;
 	public static void configureLogging() {
 		if (WRITE_TO_FILE) {
 			org.tinylog.configuration.Configuration.set("writer", "file");
@@ -68,4 +67,5 @@ public enum LogTags {
 		System.out.println("Logging \"" + enabledTags + "\"");
 		org.tinylog.configuration.Configuration.set("writer.tag", enabledTags.toString());
 	}
+	private static final boolean WRITE_TO_FILE = false;
 }
